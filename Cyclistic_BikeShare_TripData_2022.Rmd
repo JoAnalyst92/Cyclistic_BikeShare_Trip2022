@@ -1,0 +1,426 @@
+---
+title: "Cyclistic BikeShare TripData 2022"
+author: "Joachim"
+date: "2023-03-06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+My first case study is going to be based on a Case Study 1 which was provided in the Google Data Analytics Professional Course. Case study 1 is based on a fictional company also known as Cyclistic (bike-share) which was launched in 2016.
+
+## Phases of Analysis
+
+For this project following phases of data analysis will be carried out as follows :
+
+* Ask
+* Prepare
+* Process
+* Analyze 
+* Share
+* Act
+
+## Case Study Roadmap
+
+Following Case Study Roadmap will be followed on each data analysis process:
+
+* Obtaining the dataset for the year 2022.
+* Importing dataset into RStudio Desktop.
+* View, clean, merge datasets for each month.
+* Code, when needed on the step.
+* Key tasks, as a checklist.
+* Deliverable, as a checklist.
+
+## Scenario
+
+You are a junior data analyst working in the marketing analyst team at Cyclistic, a bike-share company in Chicago. The director of marketing (Lily Moreno) believes the company’s future success depends on maximizing the number of annual memberships. Therefore, your team wants to understand how casual riders and annual members use Cyclistic bikes differently. From these insights, your team will design a new marketing strategy to convert casual riders into annual members. But first, Cyclistic executives must approve your recommendations, so they must be backed up with compelling data insights and professional data visualizations. 
+
+## Characters and Teams
+
+**Cyclistic**: A bike-share program that features more than 5,800 bicycles and 600 docking stations. Cyclistic sets itself apart by also offering reclining bikes, hand tricycles, and cargo bikes, making bike-share more inclusive to people with disabilities and riders who can’t use a standard two-wheeled bike. The majority of riders opt for traditional bikes; about 8% of riders use the assistive options. Cyclistic users are more likely to ride for leisure, but about 30% use them to commute to work each day.
+
+**Lily Moreno**: The director of marketing and your manager. Moreno is responsible for the development of campaigns and initiatives to promote the bike-share program. These may include email, social media, and other channels. 
+
+**Cyclistic marketing analytics team**: A team of data analysts who are responsible for collecting, analyzing, and reporting data that helps guide Cyclistic marketing strategy. You joined this team six months ago and have been busy learning about Cyclistic’s mission and business goals — as well as how you, as a junior data analyst, can help Cyclistic achieve them. 
+
+**Cyclistic executive team**: The notoriously detail-oriented executive team will decide whether to approve the recommended marketing program. 
+
+## Ask
+
+Three questions will guide the future marketing program:
+
+1.	How do annual members and casual riders use Cyclistic bikes differently? (First question by Lily Moreno)
+
+2.	Why would casual riders buy Cyclistic annual memberships?
+
+3.	How can Cyclistic use digital media to influence casual riders to become members?
+
+### Key Task
+
+*Business task*: The main business objective is to design marketing strategies with the sole objective of converting casual riders into annual members by understanding how they differ.
+
+*Stakeholders*: 
+
+* Director of Marketing (Lily Moreno),
+* Marketing Analytics team,
+* Executive team.
+
+## Prepare
+
+Cyclistic’s historical trip data will be used to analyze and identify trends. 
+Checking whether the data provided is ROCCC:
+
+* **R**eliable - The data has been made available by **Motivate International Inc.** under this [license](https://ride.divvybikes.com/data-license-agreement). 
+* **O**riginal- Lyft Bikes and Scooters, LLC, operates the City of Chicago’s, subject to the terms and conditions of the [Data License Agreement](https://ride.divvybikes.com/data-license-agreement).
+* **C**omprehensive- The data is organized in .cvs files for the year 2022 is separated by trip month.
+* **C**urrent- For this analyses, only datasets in the year 2022 will be considered for analyses.The data is documented in csv formats monthly.
+* **C**ited- The dataset is public and available [here](https://divvy-tripdata.s3.amazonaws.com/index.html)
+
+### Key Task
+
+Downloaded data sets for the year 2022 (csv files are separated by months) and stored in local drive.
+
+***Note: In view of the large datasets, RStudio Desktop tool will be adopted to conduct the analyses, cleaning and visualization.***
+
+
+## Installing and loading packages
+
+```{r}
+# install.packages("tidyverse")
+# install.packages("tidyr")
+# install.packages("lubridate")
+# install.packages("ggplot2")
+# install.packages("janitor")
+# install.packages("dplyr")
+library("tidyverse")  
+library("lubridate")  
+library("ggplot2")
+library("janitor")
+library("dplyr")
+library("tidyr")
+library("tibble")
+```
+
+## Setting work directory
+
+```{r}
+setwd("~/Desktop/DATA ANALYTICS/GOOGLE DATA ANALYTICS CAPSTONE PROJECT/PORTFOLIO/CYCLISTIC-BIKE-SHARE/R_Programming_cyclistic_bike_share/csv")
+
+```
+
+## Importing csv files (not cleaned) into RStudio and renaming csv files to a shorter naming
+
+```{r}
+jan_2022 <- read_csv("202201-divvy-tripdata.csv")
+feb_2022 <- read_csv("202202-divvy-tripdata.csv")
+mar_2022 <- read_csv("202203-divvy-tripdata.csv")
+apr_2022 <- read_csv("202204-divvy-tripdata.csv")
+may_2022 <- read_csv("202205-divvy-tripdata.csv")
+jun_2022 <- read_csv("202206-divvy-tripdata.csv")
+jul_2022 <- read_csv("202207-divvy-tripdata.csv")
+aug_2022 <- read_csv("202208-divvy-tripdata.csv")
+sep_2022 <- read_csv("202209-divvy-publictripdata.csv")
+oct_2022 <- read_csv("202210-divvy-tripdata.csv")
+nov_2022 <- read_csv("202211-divvy-tripdata.csv")
+dec_2022 <- read_csv("202212-divvy-tripdata.csv")
+```
+
+#### Note: Each csv files have the same column naming and number of columns
+
+## Merge all csv files into one data frame (uncleaned version)
+
+```{r}
+data_uncleaned_merged<-bind_rows(jan_2022,feb_2022,mar_2022,apr_2022,may_2022,jun_2022,jul_2022,aug_2022,sep_2022,oct_2022,nov_2022,dec_2022)
+```
+
+## Process
+
+**Data Cleaning**
+
+Data cleaning with the raw combined data frame from each month is a must in order to ensure the analysis is carried out
+with appropriate cleaned data.
+
+1. To get an overview of the combined data frame:
+```{r}
+summary(data_uncleaned_merged)
+```
+Note: It shows that there are 5858 nos. of NULL values within the data frame. Removing these NULL values as part of the cleaning process will be carried out.
+
+2. Clean the combine data_uncleaned_merged and renaming a new data frame (2022_tripdata_cleaned) after NULL values have been removed (drop_na).
+
+```{r}
+tripdata_cleaned<-drop_na(data_uncleaned_merged)
+```
+
+3. After removing the NULL values, it is always a good practice to check for any NULL values again.
+
+```{r}
+summary(tripdata_cleaned)
+```
+Note: It shows that there are 5858 nos. of NULL values were removed.
+
+4. We can see that the column name **start_at** and **end_at** consist of a combination of time and the date. I've splitted the time and date into separate columns for better structure and format.
+
+```{r}
+tripdata_cleaned$start_date <- as.Date(tripdata_cleaned$started_at) #Add date column
+tripdata_cleaned$start_time<- format(as.POSIXct(tripdata_cleaned$started_at), 
+                                     format="%H:%M:%S") #Add time column
+tripdata_cleaned$end_date <- as.Date(tripdata_cleaned$ended_at) #Add date column
+tripdata_cleaned$end_time<- format(as.POSIXct(tripdata_cleaned$ended_at), 
+                                     format="%H:%M:%S") #Add time column
+tripdata_cleaned
+```
+Note: Columns created (start_date,start_time,end_date,end_time) are shown at the column index number 14 to 17, which may not be easily viewed. Relocation of the new columns created is carried out in new data frame tripdata_cleaned_relocate.
+
+```{r}
+tripdata_cleaned_relocate<- tripdata_cleaned%>% relocate(start_date,start_time,end_date,end_time, .after = rideable_type)
+tripdata_cleaned_relocate
+```
+
+## Analyze
+
+Identifying Trends and Patterns
+
+To perform statistical analyses to determine the difference in behaviour between the casual and members users.
+
+1. First we will create a new column ride_length which calculates the duration of a ride (ended_at-started_at) in seconds in our tripdata_cleaned_relocate dataframe.
+```{r}
+tripdata_cleaned_relocate$ride_length<-difftime(tripdata_cleaned_relocate$ended_at,tripdata_cleaned_relocate$started_at)
+```
+
+Check the structure of the columns to view ride_length in seconds
+```{r}
+str(tripdata_cleaned_relocate)
+```
+Convert ride_length from Factor to numeric for ease of calculation. We check if ride_length factor
+```{r}
+is.factor(tripdata_cleaned_relocate$ride_length)
+```
+Converting ride_length to numeric
+```{r}
+tripdata_cleaned_relocate$ride_length<- as.numeric(as.character(tripdata_cleaned_relocate$ride_length))
+is.numeric(tripdata_cleaned_relocate$ride_length)
+```
+Checking for ride lengths equal or less than 0 sec
+```{r}
+nrow(subset(tripdata_cleaned_relocate,ride_length <= 0))
+```
+
+Removing data having negative ride lengths
+```{r}
+tripdata_cleaned_v1<-tripdata_cleaned_relocate[!(tripdata_cleaned_relocate$ride_length<=0),]
+```
+Checking the new dataframe tripdata_cleaned_v1
+```{r}
+glimpse(tripdata_cleaned_v1)
+```
+
+2. Next, we will calculate mean, median, max and min values of the ride_length created for the casual and member users.
+
+Mean ride_length between casual and member users.
+```{r}
+aggregate(tripdata_cleaned_v1$ride_length~tripdata_cleaned_v1$member_casual,FUN=mean)
+```
+Median ride_length between casual and member users.
+```{r}
+aggregate(tripdata_cleaned_v1$ride_length~tripdata_cleaned_v1$member_casual,FUN=median)
+```
+Maximum ride_length between casual and member users.
+```{r}
+aggregate(tripdata_cleaned_v1$ride_length~tripdata_cleaned_v1$member_casual,FUN=max)
+```
+
+Minimum ride_length between casual and member users.
+```{r}
+aggregate(tripdata_cleaned_v1$ride_length~tripdata_cleaned_v1$member_casual,FUN=min)
+```
+Now we will summarize the descriptive analysis on ride_length for casual and member users into a tibble.
+
+```{r}
+tripdata_cleaned_v1 %>%
+  group_by(member_casual) %>%
+  summarise(avg_ride=mean(ride_length),median_ride=median(ride_length),max_ride=max(ride_length),min_ride=min(ride_length))
+
+```
+3. We would need to add another colummn to the tripdata_cleaned_v1 data frame indicating date, day, month, year  corresponding to the dates of the rides.
+
+```{r}
+tripdata_cleaned_v1$date <- as.Date(tripdata_cleaned_v1$started_at) 
+tripdata_cleaned_v1$month <- format(as.Date(tripdata_cleaned_v1$date),"%m") 
+tripdata_cleaned_v1$day <- format(as.Date(tripdata_cleaned_v1$date),"%d")
+tripdata_cleaned_v1$year <- format(as.Date(tripdata_cleaned_v1$date),"%Y")
+tripdata_cleaned_v1$day_of_week <- format(as.Date(tripdata_cleaned_v1$date),"%A")
+```
+
+4. Calculating the comparing the total rides between member and casual users.
+
+```{r}
+tripdata_cleaned_v1 %>%
+  group_by(member_casual) %>%
+  summarise(total_ride=length(ride_id))
+```
+5. We will now plot a bar chart showing the total rides between casual and member users.
+
+```{r}
+ggplot(data=tripdata_cleaned_v1) + geom_bar(mapping=aes(x=member_casual, fill=member_casual,)) + labs(title="No. of Rides of Members vs Casual",x="member_casual",y="No. of Rides")+
+  annotate("text",x="member",y=2611200,label="2611005")+ 
+  annotate("text",x="casual",y=1758047,label="1758047")
+```
+
+
+* Observation:
+  The bar chart shows that the member users are more compared to
+  casual users. The percentage of difference between the member users
+  and casual users 39%.
+
+* Revisiting the business task: 
+a) To convert the casual riders to annual members to understand how they differ in terms of usage.
+b) To do this, we need to find out what days recorded the highest usage from the casual and member riders.
+
+6. To order and group member_casual with day_of_week and visualize to draw insights.
+```{r}
+tripdata_cleaned_v1$day_of_week<-ordered(tripdata_cleaned_v1$day_of_week,levels=c("Sunday","Monday","Tuesday", "Wednesday", "Thursday", "Friday", "Saturday")) #to order day of week to begin with Sunday
+```
+
+```{r}
+tripdata_cleaned_v1 %>%
+  group_by(member_casual, day_of_week) %>% 
+  summarise(average_duration = mean(ride_length/60), .groups = 'drop') %>% 
+  arrange(member_casual, day_of_week) %>% 
+  ggplot(aes(x = day_of_week, y = average_duration, fill = member_casual)) +
+  geom_col(position = "dodge") +
+  labs(x = "Days of Week", y = "Average Ride Duration (min)", 
+       fill = "Member/Casual",
+       title = "Average Riding Duration by Day: Members vs. Casual Riders", caption = "Data by Motivate International Inc") 
+```
+
+* Observation: 
+  a. Casual riders tend to have a higher average rides for days of week compared to the member
+     riders.
+  b. Average ride duration for casual riders is between (20-30 mins a day) compared to member
+     riders which ranges
+     between (12-14 mins a day).
+  c. Casual riders have a maximum average ride lengths on the weekends (Saturdays and
+     Sundays).
+
+7. Now that we have assessed the average ride lengths for days of week, we will now assess the average ride lengths for casual and member riders per month. 
+
+Hypothesis: Casual riders tend to have a peak usage during the holiday season, whilst predicting that the member users usage during the holiday period to decrease.
+
+```{r Average Number of Rides by Month (Casual Riders)}
+tripdata_cleaned_v1 %>% 
+  group_by(month, member_casual) %>% 
+  summarize(number_of_rides = n(), .groups = 'drop') %>% 
+  filter(member_casual == 'casual') %>%
+  drop_na() %>%
+  ggplot(aes(x = month, y = number_of_rides, fill = member_casual)) + 
+  geom_bar(position = 'dodge', stat = 'identity',fill= "#F8766D") + scale_y_continuous(labels = scales::comma) +
+  theme(axis.text.x = element_text(angle = 45)) + 
+  labs(x = "Month", y = "Number of Rides", 
+       fill = "Member/Casual",
+       title = "Average Number of Rides by Month: Casual Riders")
+```
+
+```{r Average Number of Rides by Month (Member Riders)}
+tripdata_cleaned_v1 %>% 
+  group_by(month, member_casual) %>% 
+  summarize(number_of_rides = n(), .groups = 'drop') %>% 
+  filter(member_casual == 'member') %>%
+  drop_na() %>%
+  ggplot(aes(x = month, y = number_of_rides, fill = member_casual)) + 
+  geom_bar(position = 'dodge', stat = 'identity',fill= "#00BFC4") + scale_y_continuous(labels = scales::comma) +
+  theme(axis.text.x = element_text(angle = 45)) + 
+  labs(x = "Month", y = "Number of Rides", 
+       fill = "Member/Casual",
+       title = "Average Number of Rides by Month: Member Riders")
+```
+
+
+* Observation:
+
+  a. Casual riders tend to have a maximum count in rides for the month of July and the lowest in the
+month of January.
+  b. The only holidays in Chicago is the 4th of July 2022 which is Independence day. Our hypothesis is partially true but is not the definite reason for the peak rides of the casual members.
+  c. Member riders tend to have a drop of ride usage beginning from the month of October to December. The reducing trend may be due to public holidays.
+  
+8. We will now summarize the top fifteen (15) most popular stations where the member and casual riders begin their rides.
+   
+```{r Combining all start_station_name and creating a dataframe "combined_station"}
+combined_station<-bind_rows(data.frame("stations"=tripdata_cleaned_v1$start_station_name,
+                                    "member_casual"=tripdata_cleaned_v1$member_casual),
+                         data.frame("stations"=tripdata_cleaned_v1$end_station_name,
+                                    "member_casual"=tripdata_cleaned_v1$member_casual))
+combined_station_cleaned<-combined_station[!(combined_station$stations==""|is.na(combined_station$stations)),] #remove empty station names
+combined_station_member<-combined_station_cleaned[combined_station_cleaned$member_casual=='member',]
+combined_station_casual<-combined_station_cleaned[combined_station_cleaned$member_casual=='casual',]
+#summarize the top most popular start stations for both member and casual riders.
+top15_stations<-combined_station_cleaned %>%
+  group_by(stations) %>%
+  summarize(station_count=n()) %>%
+  arrange(desc(station_count)) %>%
+  slice(1:15)
+#group the top fifteen(15) stations by member riders.
+top15_stations_member<-combined_station_member %>%
+  group_by(stations) %>%
+  summarise(station_count=n()) %>%
+  arrange(desc(station_count)) %>%
+  slice(1:15)
+#group the top fifteen(15) stations by casual riders.
+top15_stations_casual<-combined_station_casual %>%
+  group_by(stations) %>%
+  summarise(station_count=n()) %>%
+  arrange(desc(station_count)) %>%
+  slice(1:15)
+```
+
+9. Creating visualization of the top fifteen (15) stations for member and casual riders.
+
+```{r top15_stations_member}
+ggplot(data = top15_stations_member) +
+  geom_col(aes(x = reorder(stations, station_count), y = station_count), fill = "#00BFC4") +
+  labs(title = "Top 15 Used Stations by Member Riders", y = "Number of Rides", x = "") +
+  scale_y_continuous(labels = scales::comma) +
+  coord_flip() +
+  theme_minimal()
+```
+```{r top15_stations_casual}
+ggplot(data = top15_stations_casual) +
+  geom_col(aes(x = reorder(stations, station_count), y = station_count), fill = "#F8766D") +
+  labs(title = "Top 15 Used Stations by Casual Riders", y = "Number of Rides", x = "") +
+  scale_y_continuous(labels = scales::comma) +
+  coord_flip() +
+  theme_minimal()
+```
+
+
+* Observations:
+  a. We can see that the top most usage from member riders is at "Kingsbury St & Kinzie St"
+     with more than 45,000 riders which begin their trip at this station.
+  b. On the other hand, the top most usage from casual riders is at "Streeter Dr & Grand Ave"
+     with more than 95,000 riders which begin their trip at this station.
+
+## Share
+
+### Insights:
+* Casual riders tend to have higher average rides and ride durations
+  compared to member riders.
+* Casual riders tend to have a higher average ride lengths on weekends
+  compared to member riders. 
+* Casual riders tend to have a high maximum in the month of July where
+  Independence Day falls on the 4th of July 2022. 
+* Casual riders have the maximum usage when the start station is located
+  at "Streeter Dr & Grand Ave"
+  
+## Recommendation:
+* Provide some additional discounts for recurring casual riders which consistently use the bikes on weekends.
+* Provide some additional rewards or offers for casual riders during the holiday period in the month of July.
+* Collaborate with the local business station :"Streeter Dr & Grand Ave", to provide discounts for memberships for casual riders
+  located at this station.
+  
+## Additional recommendation on Data Collection:
+* To advice the stakeholders to collect additional data like the demographics of their casual and member riders in order to provide
+  further insights on the consumer behavior.
